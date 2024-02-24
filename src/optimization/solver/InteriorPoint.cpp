@@ -261,6 +261,10 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   }
 #endif
 
+  std::ofstream errorCsv{"error.csv"};
+  errorCsv
+      << "iterations,|∇f − Aₑᵀy − Aᵢᵀz|_∞,|Sz − μe|_∞,|cₑ|_∞,|cᵢ − s|_∞,f\n";
+
   while (E_0 > config.tolerance &&
          acceptableIterCounter < config.maxAcceptableIterations) {
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
@@ -833,6 +837,13 @@ void InteriorPoint(std::span<Variable> decisionVariables,
           solver.HessianRegularization(), α);
     }
 #endif
+
+    errorCsv << iterations << ','
+             << Eigen::VectorXd(g - A_e.transpose() * y - A_i.transpose() * z)
+                    .lpNorm<Eigen::Infinity>()
+             << ',' << (S * z - μ * e).lpNorm<Eigen::Infinity>() << ','
+             << c_e.lpNorm<Eigen::Infinity>() << ','
+             << (c_i - s).lpNorm<Eigen::Infinity>() << ',' << f.Value() << '\n';
 
     ++iterations;
 
