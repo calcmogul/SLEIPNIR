@@ -144,7 +144,7 @@ class ExpressionGraph {
     // Move gradient tree to return value
     VariableMatrix grad(VariableMatrix::empty, wrt.size(), 1);
     for (int row = 0; row < grad.Rows(); ++row) {
-      grad(row) = Variable{std::move(wrt(row).expr->adjointExpr)};
+      grad[row] = Variable{std::move(wrt[row].expr->adjointExpr)};
     }
 
     // Unlink adjoints to avoid circular references between them and their
